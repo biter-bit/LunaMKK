@@ -12,10 +12,10 @@ class Settings(BaseSettings):
 
     @property
     def SYNC_LINK_PG(self):
-        return f'postgresql+psycopg2://{self.USERNAME_DB}:{self.PASSWORD_DB}@{self.HOST_DB}/{self.NAME_DB}'
+        return f'postgresql+psycopg2://{self.USERNAME_DB}:{self.PASSWORD_DB}@{self.HOST_DB}:{self.PORT_DB}/{self.NAME_DB}'
 
     @property
     def ASYNC_LINK_PG(self):
-        return f'postgresql+asyncpg://{self.USERNAME_DB}:{self.PASSWORD_DB}@{self.HOST_DB}/{self.NAME_DB}'
+        return f'postgresql+asyncpg://{self.USERNAME_DB}:{self.PASSWORD_DB}@{self.HOST_DB}:{self.PORT_DB}/{self.NAME_DB}'
 
 settings = Settings()

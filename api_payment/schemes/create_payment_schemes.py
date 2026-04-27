@@ -1,12 +1,6 @@
 import datetime
-
-from enum import Enum
 from pydantic import BaseModel
-
-class CurrencyEnum(str, Enum):
-    USD = 'USD'
-    EUR = 'EUR'
-    RUB = 'RUB'
+from enums.currency import CurrencyEnum
 
 class PaymentCreate(BaseModel):
     amount: int = 0

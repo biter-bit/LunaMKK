@@ -1,0 +1,6 @@
+FROM python
+WORKDIR /app
+COPY api_payment/requirements.txt .
+RUN pip install -r requirements.txt
+COPY api_payment/. .
+CMD ["python", "-m", "workers.event_worker"]

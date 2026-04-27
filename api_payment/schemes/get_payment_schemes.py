@@ -1,4 +1,4 @@
 from pydantic import BaseModel
 
 class PaymentRead(BaseModel):
-    info_payment: str
+    info_payment: dict

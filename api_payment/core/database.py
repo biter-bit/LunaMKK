@@ -9,7 +9,7 @@ class Base(DeclarativeBase):
     pass
 
 async_engine = create_async_engine(settings.ASYNC_LINK_PG)
-async_session = async_sessionmaker(engine=async_engine)
+async_session = async_sessionmaker(async_engine)
 
 intpk = Annotated[int, mapped_column(primary_key=True)]
 created_at = Annotated[datetime, mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)]

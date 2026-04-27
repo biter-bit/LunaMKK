@@ -1,7 +1,8 @@
-from db.config import Base, created_at, updated_at
-from db.config import intpk
+from core.database import Base, created_at, updated_at
+from core.database import intpk
 from sqlalchemy.orm import mapped_column, Mapped
-from sqlalchemy import String, ForeignKey, JSON, Integer
+from sqlalchemy import String, ForeignKey, JSON, Integer, Enum
+from enums.status import StatusTask, Exchange, RoutingKey
 from datetime import datetime
 
 
@@ -13,9 +14,9 @@ class Outbox(Base):
     aggregate_id: Mapped[int] = mapped_column(ForeignKey("payment.id"), nullable=False)
     payload: Mapped[dict] = mapped_column(JSON, nullable=False)
 
-    routing_key: Mapped[str]
-    status: Mapped[str]
-    attempts: Mapped[int]
+    routing_key: Mapped[str] = mapped_column(String(100), nullable=False)
+    status: Mapped[StatusTask] = mapped_column(Enum(StatusTask), nullable=False)
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     error: Mapped[str | None]
     published_at: Mapped[datetime | None]
 

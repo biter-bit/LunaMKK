@@ -1,4 +1,4 @@
-from db.config import Base, intpk, created_at, updated_at
+from core.database import Base, intpk, created_at, updated_at
 from enums.currency import CurrencyEnum
 from enums.status import StatusTask
 from sqlalchemy import Integer, String, JSON, Enum
