@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from enums.status import StatusTask
-from pydantic import BaseModel
+from pydantic import BaseModel, field_serializer
 
 class OutboxScheme(BaseModel):
     id: int
@@ -20,3 +20,8 @@ class OutboxScheme(BaseModel):
 
     class Config:
         from_attributes = True
+        use_enum_values = True
+
+    @field_serializer("created_at", "updated_at")
+    def serialize_dt(self, dt: datetime):
+        return dt.isoformat()

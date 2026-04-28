@@ -1,7 +1,7 @@
 services:
   pg:
     image: postgres:15
-    restart: always
+    restart: on-failure
     environment:
       POSTGRES_USER: $USERNAME_DB
       POSTGRES_PASSWORD: $PASSWORD_DB
@@ -16,14 +16,15 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
   rabbit:
-    image: rabbitmq:latest
+    image: rabbitmq:4.3-management
     ports:
       - "15672:15672"
+    restart: on-failure
   api:
     build:
       context: .
       dockerfile: DockerfileAPI
-    restart: always
+    restart: on-failure
     ports:
       - "8000:8000"
     depends_on:
@@ -34,10 +35,22 @@ services:
       timeout: 5s
       retries: 10
   event_worker:
+    extra_hosts:
+      - "host.docker.internal:172.21.80.1"
     build:
       context: .
       dockerfile: DockerfileEWorker
-    restart: always
+    restart: on-failure
+    depends_on:
+      - pg
+      - rabbit
+  consumer:
+    extra_hosts:
+      - "host.docker.internal:172.21.80.1"
+    build:
+      context: .
+      dockerfile: DockerfileConsumerWorker
+    restart: on-failure
     depends_on:
       - pg
       - rabbit
