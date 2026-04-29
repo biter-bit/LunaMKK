@@ -1,0 +1,42 @@
+import asyncio
+from datetime import datetime
+
+from pip._vendor.rich.status import Status
+
+from enums.status import StatusTask
+from repositories.outbox_repository import get_outbox
+from broker.rabbit import send_events, publish_event
+from core.database import async_session
+from aio_pika.abc import AbstractRobustConnection, AbstractChannel
+import aio_pika
+from core.config import settings
+
+from schemes.outbox_schemes import OutboxScheme
+
+
+async def start_event_worker():
+    connection: AbstractRobustConnection = await aio_pika.connect_robust(url=settings.RABBIT_URL)
+    channel: AbstractChannel = await connection.channel()
+    try:
+        while True:
+            async with async_session() as session:
+                outboxes = await get_outbox(session=session)
+                for outbox in outboxes:
+                    serializer_outbox = OutboxScheme.model_validate(outbox).model_dump()
+                    try:
+                        await publish_event(serializer_outbox=serializer_outbox, routing_key=outbox.routing_key, channel=channel)
+                        outbox.status = StatusTask.SUCCEEDED
+                        outbox.published_at = datetime.now()
+                    except Exception as e:
+                        outbox.attempts += 1
+                        if outbox.attempts >= settings.OUTBOX_RETRIES:
+                            outbox.status = StatusTask.FAILED
+                        outbox.error = str(e)
+                await session.commit()
+                await asyncio.sleep(10)
+    finally:
+        await connection.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(start_event_worker())

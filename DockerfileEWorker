@@ -1,6 +1,6 @@
 FROM python:3.12
 WORKDIR /app
-COPY api_payment/requirements.txt .
+COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY api_payment/. .
+COPY . .
 CMD ["python", "-m", "workers.event_worker"]
