@@ -12,8 +12,8 @@ class StatusPayment(str, Enum):
 
 class StatusEvent(str, Enum):
     """Название события бизнес-логики"""
-    PAYMENT_EVENTS = 'payment.create'
+    PAYMENT_EVENTS = 'payments.new'
 
 class RoutingKey(str, Enum):
     """Ключ, по которому exchange решает, куда слать сообщение"""
-    PAYMENT_CREATED = 'payment.create'
+    PAYMENT_CREATED = 'payments.new'
