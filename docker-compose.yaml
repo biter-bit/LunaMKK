@@ -36,8 +36,8 @@ services:
       retries: 10
 
   api:
-    extra_hosts:
-      - "host.docker.internal:172.21.80.1"
+#    extra_hosts:
+#      - "host.docker.internal:172.21.80.1"
     env_file:
       - .env
     build:
@@ -58,8 +58,8 @@ services:
       retries: 10
 
   consumer:
-    extra_hosts:
-      - "host.docker.internal:172.21.80.1"
+#    extra_hosts:
+#      - "host.docker.internal:172.21.80.1"
     env_file:
       - .env
     build:
