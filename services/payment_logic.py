@@ -21,7 +21,7 @@ async def create_task(session: AsyncSession, body: InputPaymentCreate, idempoten
             webhook_url=body.webhook_url,
         )
         event = PayloadPayment(
-            payment_id=payment.id,
+            id=payment.id,
             amount=payment.amount,
             currency=payment.currency,
             description=payment.description,
@@ -32,6 +32,7 @@ async def create_task(session: AsyncSession, body: InputPaymentCreate, idempoten
         payload = event.model_dump()
         await create_outbox(session=session, payment=payment, payload=payload)
     except IntegrityError:
+        await session.rollback()
         payment = await get_by_idempotency_key(session, idempotency_key)
         is_new = False
     return is_new, payment
@@ -44,10 +45,7 @@ async def create_payment_logic(
         is_new, payment = await create_task(session=session, body=body, idempotency_key=idempotency_key)
         payment = OutputPaymentCreate.model_validate(payment)
         payment.is_new = is_new
-        if is_new:
-            await session.commit()
-        else:
-            await session.rollback()
+        await session.commit()
     return payment
 
 async def get_payment_logic(payment_id: int) -> PayloadPayment:

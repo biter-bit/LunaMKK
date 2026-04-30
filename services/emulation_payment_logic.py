@@ -1,7 +1,11 @@
 import json
+import random
+import asyncio
 
 
-async def emulation_payment(body: bytes):
-    data = json.loads(body)
+async def emulation_payment(data: dict):
+    await asyncio.sleep(random.uniform(2, 5))
 
-    print(data)
+    if random.random() < 0.1:
+        raise Exception("fail")
+    return data

@@ -2,13 +2,14 @@ from datetime import datetime
 
 from enums.status import StatusTask
 from pydantic import BaseModel, field_serializer
-from schemes.payment_schemes import OutputPaymentCreate
+from schemes.payment_schemes import PayloadPayment
+
 
 class OutboxScheme(BaseModel):
     id: int
     event_type: str
     aggregate_id: int
-    payload: OutputPaymentCreate
+    payload: PayloadPayment
 
     status: StatusTask
     routing_key: str

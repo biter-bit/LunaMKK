@@ -1,11 +1,8 @@
 import asyncio
 from datetime import datetime
-
-from pip._vendor.rich.status import Status
-
 from enums.status import StatusTask
 from repositories.outbox_repository import get_outbox
-from broker.rabbit import send_events, publish_event
+from broker.rabbit import publish_event, setup, connect_with_retry
 from core.database import async_session
 from aio_pika.abc import AbstractRobustConnection, AbstractChannel
 import aio_pika
@@ -15,9 +12,11 @@ from schemes.outbox_schemes import OutboxScheme
 
 
 async def start_event_worker():
-    connection: AbstractRobustConnection = await aio_pika.connect_robust(url=settings.RABBIT_URL)
-    channel: AbstractChannel = await connection.channel()
+    connection: AbstractRobustConnection = await connect_with_retry(url=settings.RABBIT_URL)
+
     try:
+        channel: AbstractChannel = await connection.channel()
+        await setup(channel=channel)
         while True:
             async with async_session() as session:
                 outboxes = await get_outbox(session=session)
@@ -34,9 +33,8 @@ async def start_event_worker():
                         outbox.error = str(e)
                 await session.commit()
                 await asyncio.sleep(10)
+    except Exception as e:
+        print(f"Exception: {e}")
+        raise
     finally:
         await connection.close()
-
-
-if __name__ == "__main__":
-    asyncio.run(start_event_worker())

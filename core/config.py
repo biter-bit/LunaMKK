@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     HOST_DB: str
     PORT_DB: int
     API_KEY: str
+    RABBIT_USER: str
+    RABBIT_PASSWORD: str
     RABBIT_URL: str
     OUTBOX_RETRIES: int
 
